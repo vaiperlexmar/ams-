@@ -1,0 +1,15 @@
+{
+    "name": "vaiperlexmar/appointment_system",
+    "autoload": {
+        "psr-4": {
+            "Authentication\\": "public/protected/models/Authentication",
+            "Authentication\\Core\\": "public/protected/models/Authentication/Core",
+            "Authentication\\Token\\": "public/protected/models/Authentication/Token",
+            "DB\\": "public/protected/models/DB",
+            "Views\\": "public/protected/view"
+        }
+    },
+    "require": {
+      "ext-pdo": "*"
+    }
+}
