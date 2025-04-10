@@ -5,7 +5,6 @@ namespace Authentication\Core;
 use Authentication\UserInterface;
 use Authentication\Token\UserTokenInterface;
 use Authentication\Token\UserToken;
-use DB\DB;
 
 class UserManager implements UserManagerInterface
 {

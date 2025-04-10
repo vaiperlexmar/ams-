@@ -43,7 +43,12 @@ class User implements UserInterface
 
     public function setRoles(array $roles): self
     {
-        $this->roles = $roles;
+        if (count($roles) === 1) {
+            $this->roles = [$roles[0]["name"]];
+        } else {
+            $this->roles = [$roles[0]["name"], $roles[1]["name"]];
+        }
+
         return $this;
     }
 

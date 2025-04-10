@@ -25,4 +25,12 @@ trait PasswordTrait
         }
         $this->cost = $cost;
     }
+
+    public function passwordConfirmed(string $plainPassword, string $confirmedPassword): bool {
+        if ($plainPassword === $confirmedPassword) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
