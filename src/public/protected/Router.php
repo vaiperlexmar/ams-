@@ -1,31 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace protected;
 
 class Router
 {
-    public string $request;
-    public array $routes = [];
+    private array $routes = [];
 
-    public function __construct(array $request)
+    public function addRoute(string $method, string $path, array $controller): void
     {
-        $this->request = basename($request['REQUEST_URI']);
+        $path = $this->normalizePath($path);
+        $this->routes[] = ['path' => $path, 'method' => strtoupper($method), 'controller' => $controller, 'middlewares' => []];
     }
 
-    public function addRoute(string $uri, \Closure $callback): void
+    private function normalizePath(string $path): string
     {
-        $this->routes[$uri] = $callback;
+        $path = trim($path, '/');
+        $path = "/{$path}/";
+        $path = preg_replace('#[/]{2,}#', '/', $path);
+        return $path;
     }
 
-    public function match(string $uri): bool
+    public function dispatch(string $path): void
     {
-        return array_key_exists($uri, $this->routes);
-    }
+        $path = $this->normalizePath($path);
+        $method = strtoupper($_SERVER['REQUEST_METHOD']);
+        foreach ($this->routes as $route) {
+            if (!preg_match("#^{$route['path']}$#", $path) || $route['method'] !== $method) {
+                continue;
+            }
 
-    public function run(): void
-    {
-        if ($this->match($this->request)) {
-            $this->routes[$this->request]->call($this);
+            [$class, $function] = $route['controller'];
+
+            $controllerInstance = new $class();
+
+            $controllerInstance->{$function}();
         }
     }
 }

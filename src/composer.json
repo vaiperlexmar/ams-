@@ -7,7 +7,8 @@
             "Authentication\\Token\\": "public/protected/models/Authentication/Token",
             "DB\\": "public/protected/models/DB",
             "Views\\": "public/protected/view",
-            "protected\\": "public/protected"
+            "protected\\": "public/protected",
+            "Exceptions\\": "public/protected/exceptions"
         }
     },
     "require": {
