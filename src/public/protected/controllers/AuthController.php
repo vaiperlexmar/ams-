@@ -2,33 +2,46 @@
 
 namespace protected\controllers;
 
+use Authentication\Core\UserManagerInterface;
 use Views\View;
+use Authentication\Core\UserManager;
+use Authentication\User;
+use DB\DB;
 
 class AuthController
 {
+    private $db;
+    private UserManagerInterface $userManager;
+
+    public function __construct(DB $db, UserManagerInterface $userManager)
+    {
+        $this->db = $db;
+        $this->userManager = $userManager;
+    }
+
     public function authPage(): void
     {
         echo View::make("form")->render();
     }
 
-    public function registerAction()
+    public function register(): void
     {
-        $password = $userManager->cryptPassword($_POST["password"]);
+        $password = $this->userManager->cryptPassword($_POST["password"]);
         $user = (new User())
             ->setUsername($_POST["username"])
             ->setPassword($password)
             ->setRoles(["ROLE_USER"]);
 
-        $userManager->createUserToken($user);
+        $this->userManager->createUserToken($user);
 
-        $userId = $db->insert("INSERT INTO users (username, password) VALUES (?, ?)", [$user->getUsername(), $user->getPassword()]);
-        $db->insert("INSERT INTO roles (name, owner_id) VALUES (?, ?)", [$user->getRoles()[0], $userId]);
+        $userId = $this->db->insert("INSERT INTO users (username, password) VALUES (?, ?)", [$user->getUsername(), $user->getPassword()]);
+        $this->db->insert("INSERT INTO roles (name, owner_id) VALUES (?, ?)", [$user->getRoles()[0], $userId]);
     }
 
-    public function loginAction()
+    public function login(): void
     {
-        $userFromDataBase = $db->select("SELECT * FROM users WHERE username = ?", [$_POST["username"]]);
-        $roles = $db->select("SELECT * FROM roles WHERE owner_id = ?", [$userFromDataBase[0]["id"]]);
+        $userFromDataBase = $this->db->select("SELECT * FROM users WHERE username = ?", [$_POST["username"]]);
+        $roles = $this->db->select("SELECT * FROM roles WHERE owner_id = ?", [$userFromDataBase[0]["id"]]);
 
         $user = (new User())
             ->setUsername($userFromDataBase[0]["username"])
@@ -36,9 +49,8 @@ class AuthController
             ->setRoles($roles)
             ->setEnabled((bool)$userFromDataBase[0]["enabled"]);
 
-        $userManager = new UserManager();
-        if ($userManager->isPasswordValid($user, $_POST["password"])) {
-            $userManager->createUserToken($user);
+        if ($this->userManager->isPasswordValid($user, $_POST["password"])) {
+            $this->userManager->createUserToken($user);
         } else {
             throw new Exception("Invalid username or password");
         }

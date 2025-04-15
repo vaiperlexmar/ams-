@@ -1,3 +1,14 @@
+<?php
+
+use Authentication\Token\UserTokenInterface;
+
+if (!isset($_SESSION[UserTokenInterface::DEFAULT_PREFIX_KEY])) {
+    header("Location: /auth");
+    exit;
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,5 +17,5 @@
     <title>AMS</title>
     <!--    <link rel="stylesheet" href="/assets/styles/main.css">-->
 </head>
-    <h1>Hello</h1>
+<h1>Hello</h1>
 </html>
